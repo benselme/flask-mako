@@ -7,8 +7,7 @@ flask-genshi and flask itself.
 Installation
 ------------
     setup.py install
-    
-    
+
 Usage
 -----
 
@@ -46,6 +45,7 @@ templates, including g, session, etc.
         return render_template('hello.html', name='mako')
 
 *Babel integration*
+
 flask-makotemplates will detect flask-babel if it is used by the application
 and will automatically add the appropriate imports when creating the
 TemplateLookup object
