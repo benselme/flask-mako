@@ -13,11 +13,13 @@ from flask.helpers import locked_cached_property
 from flask.signals import template_rendered
 from mako.lookup import TemplateLookup
 from mako.template import Template
+from mako import exceptions
 from flask import _request_ctx_stack
 import os
 
 _BABEL_IMPORTS =  'from flaskext.babel import gettext as _, ngettext, ' \
                   'pgettext, npgettext'
+_FLASK_IMPORTS =  'from flask.helpers import url_for, get_flashed_messages'
 
 
 class MakoTemplates(object):
@@ -79,11 +81,10 @@ class MakoTemplates(object):
         by adding the appropriate imports clause.
 
         """
-        imports = self.app.config['MAKO_IMPORTS']
+        imports = self.app.config['MAKO_IMPORTS'] or []
+        imports.append(_FLASK_IMPORTS)
 
         if 'babel' in self.app.extensions:
-            if not imports:
-                imports = []
             imports.append(_BABEL_IMPORTS)
 
         kw = {
@@ -98,10 +99,11 @@ class MakoTemplates(object):
         template_paths = [path]
         blueprints = getattr(self.app, 'blueprints', {})
         for name, blueprint in blueprints.iteritems():
-            blueprint_template_path = os.path.join(blueprint.root_path,
-                blueprint.template_folder)
-            if os.path.isdir(blueprint_template_path):
-                template_paths.append(blueprint_template_path)
+            if blueprint.template_folder:
+                blueprint_template_path = os.path.join(blueprint.root_path,
+                    blueprint.template_folder)
+                if os.path.isdir(blueprint_template_path):
+                    template_paths.append(blueprint_template_path)
         return TemplateLookup(directories=template_paths, **kw)
 
     def get_template(self, template_name):
@@ -113,9 +115,13 @@ class MakoTemplates(object):
 
 def _render(template, context, app):
     """Renders the template and fires the signal"""
-    rv = template.render(**context)
-    template_rendered.send(app, template=template, context=context)
-    return rv
+    try:
+        rv = template.render(**context)
+        template_rendered.send(app, template=template, context=context)
+        return rv
+    except:
+        print exceptions.text_error_template().render()
+        raise
 
 
 def render_template(template_name, **context):
