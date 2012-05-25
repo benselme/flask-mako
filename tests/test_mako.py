@@ -3,7 +3,8 @@ import sys
 
 import unittest
 from flask import Flask, g
-from flaskext.makotemplates import MakoTemplates, render_template, render_template_string
+from flaskext.makotemplates import MakoTemplates, render_template, \
+    render_template_string, render_template_def
 
 class MakoTestCase(unittest.TestCase):
 
@@ -26,6 +27,12 @@ class MakoTestCase(unittest.TestCase):
         def template_file():
             return render_template('template_file.html', result="succeeds")
 
+        @app.route('/def_file')
+        def def_file():
+            return render_template_def('def_file.html', 'test_def',
+                result="This")
+
+
 
     def tearDown(self):
         pass
@@ -39,6 +46,14 @@ class MakoTestCase(unittest.TestCase):
         c = self.app.test_client()
         result = c.get('/context')
         self.assertEqual(result.data, 'test_g')
+
+    def testRenderTemplateDef(self):
+        c = self.app.test_client()
+        result = c.get('/def_file')
+        self.assertIn('This is inside the def.', result.data)
+        self.assertNotIn('This is above the def.', result.data)
+        self.assertNotIn('That is inside the def.', result.data)
+        self.assertNotIn('This is below the def.', result.data)
 
 try:
     from flaskext import babel

@@ -151,3 +151,23 @@ def render_template_string(source, **context):
     ctx.app.update_template_context(context)
     return _render(ctx.app.mako_instance.from_string(source),
         context, ctx.app)
+
+
+def render_template_def(template_name, def_name, **context):
+    """Renders a specific def from a given
+    template from the template folder with the given
+    context. Useful for implementing this AJAX pattern:
+
+    http://techspot.zzzeek.org/2008/09/01/ajax-the-mako-way
+
+    :param template_name: the name of the template file containing the def
+                    to be rendered
+    :param def_name: the name of the def to be rendered
+    :param context: the variables that should be available in the
+                    context of the template.
+    """
+    ctx = _request_ctx_stack.top
+    ctx.app.update_template_context(context)
+    return _render(ctx.app.mako_instance.\
+        get_template(template_name).get_def(def_name),
+            context, ctx.app)
