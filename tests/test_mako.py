@@ -50,10 +50,10 @@ class MakoTestCase(unittest.TestCase):
     def testRenderTemplateDef(self):
         c = self.app.test_client()
         result = c.get('/def_file')
-        self.assertIn('This is inside the def.', result.data)
-        self.assertNotIn('This is above the def.', result.data)
-        self.assertNotIn('That is inside the def.', result.data)
-        self.assertNotIn('This is below the def.', result.data)
+        self.assertTrue('This is inside the def.' in result.data)
+        self.assertFalse('This is above the def.' in result.data)
+        self.assertFalse('That is inside the def.' in result.data)
+        self.assertFalse('This is below the def.' in result.data)
 
 try:
     from flaskext import babel
