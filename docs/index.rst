@@ -70,5 +70,13 @@ imports when creating the TemplateLookup object
 
 API
 ````
-.. automodule:: makotemplates
+.. module:: makotemplates
+
+.. autoclass:: MakoTemplates
     :members:
+
+.. autofunction:: render_template
+
+.. autofunction:: render_template_string
+
+.. autofunction:: render_template_def
