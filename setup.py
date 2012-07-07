@@ -1,16 +1,10 @@
 """
 flask-makotemplates
-----------
+-------------------
 
-Mako templates support for Flask applications.
-
-Links
-`````
-
-* `on github
-<https://github.com/benselme/flask-makotemplates>`_
-
-.. _Mako: http://www.makotemplates.org/
+This extension for the `Flask <http://flask.pocoo.org/>`_ micro web framework
+allows for `Mako Templates <http://http://www.makotemplates.org/>`_ to be used
+instead of the default Jinja2 templating engine.
 
 """
 from setuptools import setup
@@ -18,7 +12,7 @@ from setuptools import setup
 
 setup(
     name='Flask-MakoTemplates',
-    version='0.1',
+    version='0.2',
     url='https://github.com/benselme/flask-makotemplates',
     license='BSD',
     author='Beranger Enselme',

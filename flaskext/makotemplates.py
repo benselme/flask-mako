@@ -32,8 +32,8 @@ class MakoTemplates(object):
 
     ::
 
-    app = Flask(__name__)
-    mako = MakoTemplates(app)
+        app = Flask(__name__)
+        mako = MakoTemplates(app)
 
 
     """
@@ -44,17 +44,18 @@ class MakoTemplates(object):
 
 
     def init_app(self, app):
-        """Initialize a :class:`~flask.Flask` application
+        """
+        Initialize a :class:`~flask.Flask` application
         for use with this extension. Useful for the factory pattern but
         not needed if you passed your application to the :class:`MakoTemplates`
         constructor.
 
         ::
 
-        mako = MakoTemplates()
+            mako = MakoTemplates()
 
-        app = Flask(__name__)
-        mako.init_app(app)
+            app = Flask(__name__)
+            mako.init_app(app)
 
         """
         if not hasattr(app, 'extensions'):
@@ -73,9 +74,10 @@ class MakoTemplates(object):
 
     @locked_cached_property
     def template_lookup(self):
-        """A :class:`mako.lookup.TemplateLookup` that looks for templates
-        from the same places as Flask, ie. subfolders named 'templates'
-        in both the app folder and its blueprints' folders.
+        """Returns a :class:`TemplateLookup <mako.lookup.TemplateLookup>`
+        instance that looks for templates from the same places as Flask, ie.
+        subfolders named 'templates' in both the app folder and its blueprints'
+        folders.
 
         If flask-babel is installed it will add support for it in the templates
         by adding the appropriate imports clause.
