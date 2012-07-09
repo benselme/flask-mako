@@ -175,10 +175,11 @@ class MakoDetailedTestCase(unittest.TestCase):
         alt1_dir = os.path.join(self.root, "alt1")
         alt2_dir = os.path.join(self.root, "alt2")
 
-        with self.test_renderer(MAKO_TEMPLATE_DIR=alt1_dir) as (_, mako):
+        with self.test_renderer() as (app, _):
+            app.template_folder = alt1_dir
             self.assertEqual(render_template('app'), 'test 1')
-            with self.test_renderer(MAKO_TEMPLATE_DIR=[alt2_dir, alt1_dir],
-                                    MAKO_CACHE_DIR=None) as (_, _):
+            with self.test_renderer(MAKO_CACHE_DIR=None) as (app, _):
+                app.template_folder = alt2_dir
                 self.assertEqual(render_template('app'), 'test 2')
 
     def test_blueprints(self):
