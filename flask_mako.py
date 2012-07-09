@@ -58,13 +58,26 @@ class MakoTemplates(object):
     to how Jinja2 is used in flask, while at the same time surfacing the useful
     stuff from Mako.
 
-    Here's how to initialize the extension.
-
-    ::
+    Single app initialization::
 
         app = Flask(__name__)
+        app.template_folder = "templates"
         mako = MakoTemplates(app)
 
+    Multiple app initialization::
+
+        # ... in content.py ...
+        mako = MakoTemplates(app)
+
+        # ... in app1.py ...
+        app = Flask(__name__)
+        app.template_folder = "templates"
+        content.mako.init_app(app)
+
+        # ... in app1.py ...
+        app = Flask(__name__)
+        app.template_folder = "templates"
+        content.mako.init_app(app)
 
     """
 
@@ -92,18 +105,18 @@ class MakoTemplates(object):
             app.extensions = {}
 
         app.extensions['mako'] = self
-        app.mako_instance = self
-        self.app = app
-        self.app.config.setdefault('MAKO_INPUT_ENCODING', 'utf-8')
-        self.app.config.setdefault('MAKO_OUTPUT_ENCODING', 'utf-8')
-        self.app.config.setdefault('MAKO_MODULE_DIRECTORY', None)
-        self.app.config.setdefault('MAKO_COLLECTION_SIZE', -1)
-        self.app.config.setdefault('MAKO_IMPORTS', None)
-        self.app.config.setdefault('MAKO_FILESYSTEM_CHECKS', True)
+        app._mako_lookup = None
+
+        app.config.setdefault('MAKO_INPUT_ENCODING', 'utf-8')
+        app.config.setdefault('MAKO_OUTPUT_ENCODING', 'utf-8')
+        app.config.setdefault('MAKO_MODULE_DIRECTORY', None)
+        app.config.setdefault('MAKO_COLLECTION_SIZE', -1)
+        app.config.setdefault('MAKO_IMPORTS', None)
+        app.config.setdefault('MAKO_FILESYSTEM_CHECKS', True)
 
 
-    @locked_cached_property
-    def template_lookup(self):
+    @staticmethod
+    def create_lookup(app):
         """Returns a :class:`TemplateLookup <mako.lookup.TemplateLookup>`
         instance that looks for templates from the same places as Flask, ie.
         subfolders named 'templates' in both the app folder and its blueprints'
@@ -113,36 +126,42 @@ class MakoTemplates(object):
         by adding the appropriate imports clause.
 
         """
-        imports = self.app.config['MAKO_IMPORTS'] or []
+        imports = app.config['MAKO_IMPORTS'] or []
         imports.append(_FLASK_IMPORTS)
 
-        if 'babel' in self.app.extensions:
+        if 'babel' in app.extensions:
             imports.append(_BABEL_IMPORTS)
 
         kw = {
-            'input_encoding': self.app.config['MAKO_INPUT_ENCODING'],
-            'output_encoding': self.app.config['MAKO_OUTPUT_ENCODING'],
-            'module_directory': self.app.config['MAKO_MODULE_DIRECTORY'],
-            'collection_size': self.app.config['MAKO_COLLECTION_SIZE'],
+            'input_encoding': app.config['MAKO_INPUT_ENCODING'],
+            'output_encoding': app.config['MAKO_OUTPUT_ENCODING'],
+            'module_directory': app.config['MAKO_MODULE_DIRECTORY'],
+            'collection_size': app.config['MAKO_COLLECTION_SIZE'],
             'imports': imports,
-            'filesystem_checks': self.app.config['MAKO_FILESYSTEM_CHECKS'],
+            'filesystem_checks': app.config['MAKO_FILESYSTEM_CHECKS'],
         }
-        path = os.path.join(self.app.root_path, self.app.template_folder)
-        template_paths = [path]
-        blueprints = getattr(self.app, 'blueprints', {})
+        path = os.path.join(app.root_path, app.template_folder)
+        paths = [path]
+        blueprints = getattr(app, 'blueprints', {})
         for name, blueprint in blueprints.iteritems():
             if blueprint.template_folder:
                 blueprint_template_path = os.path.join(blueprint.root_path,
                     blueprint.template_folder)
                 if os.path.isdir(blueprint_template_path):
-                    template_paths.append(blueprint_template_path)
-        return TemplateLookup(directories=template_paths, **kw)
+                    paths.append(blueprint_template_path)
+        return TemplateLookup(directories=paths, **kw)
 
     def get_template(self, template_name):
         return self.template_lookup.get_template(template_name)
 
     def from_string(self, source):
         return Template(source, lookup=self.template_lookup)
+
+
+def _lookup(app):
+    if not app._mako_lookup:
+        app._mako_lookup = MakoTemplates.create_lookup(app)
+    return app._mako_lookup
 
 
 def _render(template, context, app):
@@ -166,7 +185,7 @@ def render_template(template_name, **context):
                     context of the template.
     """
     ctx = stack.top
-    return _render(ctx.app.mako_instance.get_template(template_name),
+    return _render(_lookup(ctx.app).get_template(template_name),
                    context, ctx.app)
 
 
@@ -180,7 +199,7 @@ def render_template_string(source, **context):
                     context of the template.
     """
     ctx = stack.top
-    return _render(ctx.app.mako_instance.from_string(source),
+    return _render(_lookup(ctx.app).from_string(source),
                    context, ctx.app)
 
 
@@ -198,6 +217,5 @@ def render_template_def(template_name, def_name, **context):
                     context of the template.
     """
     ctx = stack.top
-    return _render(ctx.app.mako_instance.\
-        get_template(template_name).get_def(def_name),
-                     context, ctx.app)
+    template = _lookup(ctx.app).get_template(template_name)
+    return _render(template.get_def(def_name), context, ctx.app)
