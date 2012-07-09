@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-    flaskext.mako_templates
+    flask.ext.mako
     ~~~~~~~~~~~~~~~~~~~~~~~
 
-    Implements the bridge to Mako Templates with support for flask-babel
+    Extension implementing Mako Templates support in Flask with support for
+    flask-babel
 
     :copyright: (c) 2012 by Béranger Enselme <benselme@gmail.com>
     :license: BSD, see LICENSE for more details.

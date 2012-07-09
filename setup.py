@@ -1,26 +1,26 @@
 """
-flask-makotemplates
--------------------
+flask-mako
+----------
 
 This extension for the `Flask <http://flask.pocoo.org/>`_ micro web framework
-allows for `Mako Templates <http://http://www.makotemplates.org/>`_ to be used
-instead of the default Jinja2 templating engine.
+allows developers to use  `Mako Templates
+<http://http://www.makotemplates.org/>`_ instead of the default Jinja2
+templating engine.
 
 """
 from setuptools import setup
 
 
 setup(
-    name='Flask-MakoTemplates',
+    name='Flask-Mako',
     version='0.2',
     url='https://github.com/benselme/flask-makotemplates',
     license='BSD',
-    author='Beranger Enselme',
+    author='Beranger Enselme, Frank Murphy',
     author_email='benselme@gmail.com',
-    description='Mako templates support for Flask applications.',
+    description='Mako templating support for Flask applications.',
     long_description=__doc__,
-    packages=['flaskext'],
-    namespace_packages=['flaskext'],
+    py_modules=['flask_mako', 'tests.test_mako'],
     zip_safe=False,
     platforms='any',
     install_requires=[
