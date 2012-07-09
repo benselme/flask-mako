@@ -15,6 +15,14 @@ from flask.helpers import locked_cached_property
 from flask.signals import template_rendered
 from flask import _request_ctx_stack
 
+# Find the stack on which we want to store the database connection.
+# Starting with Flask 0.9, the _app_ctx_stack is the correct one,
+# before that we need to use the _request_ctx_stack.
+try:
+    from flask import _app_ctx_stack as stack
+except ImportError:
+    from flask import _request_ctx_stack as stack
+
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from mako import exceptions
@@ -139,6 +147,7 @@ class MakoTemplates(object):
 
 def _render(template, context, app):
     """Renders the template and fires the signal"""
+    app.update_template_context(context)
     try:
         rv = template.render(**context)
         template_rendered.send(app, template=template, context=context)
@@ -156,10 +165,9 @@ def render_template(template_name, **context):
     :param context: the variables that should be available in the
                     context of the template.
     """
-    ctx = _request_ctx_stack.top
-    ctx.app.update_template_context(context)
+    ctx = stack.top
     return _render(ctx.app.mako_instance.get_template(template_name),
-        context, ctx.app)
+                   context, ctx.app)
 
 
 def render_template_string(source, **context):
@@ -171,10 +179,9 @@ def render_template_string(source, **context):
     :param context: the variables that should be available in the
                     context of the template.
     """
-    ctx = _request_ctx_stack.top
-    ctx.app.update_template_context(context)
+    ctx = stack.top
     return _render(ctx.app.mako_instance.from_string(source),
-        context, ctx.app)
+                   context, ctx.app)
 
 
 def render_template_def(template_name, def_name, **context):
@@ -190,8 +197,7 @@ def render_template_def(template_name, def_name, **context):
     :param context: the variables that should be available in the
                     context of the template.
     """
-    ctx = _request_ctx_stack.top
-    ctx.app.update_template_context(context)
+    ctx = stack.top
     return _render(ctx.app.mako_instance.\
         get_template(template_name).get_def(def_name),
-            context, ctx.app)
+                     context, ctx.app)
