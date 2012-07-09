@@ -9,18 +9,39 @@
     :copyright: (c) 2012 by Béranger Enselme <benselme@gmail.com>
     :license: BSD, see LICENSE for more details.
 """
-from __future__ import absolute_import
+import os
+
 from flask.helpers import locked_cached_property
 from flask.signals import template_rendered
+from flask import _request_ctx_stack
+
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from mako import exceptions
-from flask import _request_ctx_stack
-import os
+from mako.exceptions import RichTraceback, text_error_template
+
 
 _BABEL_IMPORTS =  'from flaskext.babel import gettext as _, ngettext, ' \
                   'pgettext, npgettext'
 _FLASK_IMPORTS =  'from flask.helpers import url_for, get_flashed_messages'
+
+
+class TemplateError(RuntimeError):
+    """
+    A template has thrown an error during rendering. The following properties
+    are provided by this exception:
+
+    * ``self.tb``: a ``RichTraceback`` object generated from the exception.
+    * ``self.text``: the exception information, generated with
+      ``mako.text_error_template``.
+
+    """
+    def __init__(self, template):
+        self.tb = RichTraceback()
+        self.text = text_error_template().render()
+        msg = "Error occurred while rendering template '{0}'"
+        msg = msg.format(template.uri)
+        super(TemplateError, self).__init__(msg)
 
 
 class MakoTemplates(object):
@@ -123,8 +144,8 @@ def _render(template, context, app):
         template_rendered.send(app, template=template, context=context)
         return rv
     except:
-        print exceptions.text_error_template().render()
-        raise
+        translated = TemplateError(template)
+        raise translated
 
 
 def render_template(template_name, **context):
