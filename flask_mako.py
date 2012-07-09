@@ -151,12 +151,6 @@ class MakoTemplates(object):
                     paths.append(blueprint_template_path)
         return TemplateLookup(directories=paths, **kw)
 
-    def get_template(self, template_name):
-        return self.template_lookup.get_template(template_name)
-
-    def from_string(self, source):
-        return Template(source, lookup=self.template_lookup)
-
 
 def _lookup(app):
     if not app._mako_lookup:
@@ -199,8 +193,8 @@ def render_template_string(source, **context):
                     context of the template.
     """
     ctx = stack.top
-    return _render(_lookup(ctx.app).from_string(source),
-                   context, ctx.app)
+    template = Template(source, lookup=_lookup(ctx.app))
+    return _render(template, context, ctx.app)
 
 
 def render_template_def(template_name, def_name, **context):
