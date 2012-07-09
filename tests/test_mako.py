@@ -3,8 +3,8 @@ import sys
 
 import unittest
 from flask import Flask, g
-from flaskext.makotemplates import MakoTemplates, render_template, \
-    render_template_string, render_template_def
+from flask.ext.mako import (MakoTemplates, render_template,
+                            render_template_string, render_template_def)
 
 class MakoTestCase(unittest.TestCase):
 
@@ -87,9 +87,14 @@ try:
             self.assertEqual(result.data, u"Quelque chose")
 
 except ImportError:
-    pass
+    MakoBabelTestCase = None
 
-
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(MakoTestCase))
+    if MakoBabelTestCase:
+        suite.addTest(unittest.makeSuite(MakoBabelTestCase))
+    return suite
 
 if __name__ == '__main__':
     unittest.main()

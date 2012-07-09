@@ -27,6 +27,7 @@ setup(
         'Flask',
         'Mako'
     ],
+    test_suite='tests.test_mako.suite',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
