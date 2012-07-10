@@ -35,15 +35,7 @@ _FLASK_IMPORTS =  'from flask.helpers import url_for, get_flashed_messages'
 
 
 class TemplateError(RuntimeError):
-    """
-    A template has thrown an error during rendering. The following properties
-    are provided by this exception:
-
-    * ``self.tb``: a ``RichTraceback`` object generated from the exception.
-    * ``self.text``: the exception information, generated with
-      ``mako.text_error_template``.
-
-    """
+    """ A template has thrown an error during rendering. """
     def __init__(self, template):
         self.tb = RichTraceback()
         self.text = text_error_template().render()
@@ -55,29 +47,8 @@ class TemplateError(RuntimeError):
 class MakoTemplates(object):
     """
     Main class for bridging mako and flask. We try to stay as close as possible
-    to how Jinja2 is used in flask, while at the same time surfacing the useful
+    to how Jinja2 is used in Flask, while at the same time surfacing the useful
     stuff from Mako.
-
-    Single app initialization::
-
-        app = Flask(__name__)
-        app.template_folder = "templates"
-        mako = MakoTemplates(app)
-
-    Multiple app initialization::
-
-        # ... in content.py ...
-        mako = MakoTemplates(app)
-
-        # ... in app1.py ...
-        app = Flask(__name__)
-        app.template_folder = "templates"
-        content.mako.init_app(app)
-
-        # ... in app1.py ...
-        app = Flask(__name__)
-        app.template_folder = "templates"
-        content.mako.init_app(app)
 
     """
 
