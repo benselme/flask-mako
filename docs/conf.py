@@ -103,7 +103,7 @@ html_theme = 'flask_small'
 # documentation.
 html_theme_options = {
     'index_logo': 'flask-mako.png',
-    'github_fork': 'benselme/flask-makotemplates/'
+    'github_fork': 'benselme/flask-mako/'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
