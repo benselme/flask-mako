@@ -52,25 +52,32 @@ class MakoTemplates(object):
     """
 
     def __init__(self, app=None):
+        self.app = None
         if app is not None:
             self.init_app(app)
+        self.app = app
 
 
     def init_app(self, app):
         """
         Initialize a :class:`~flask.Flask` application
-        for use with this extension. Useful for the factory pattern but
-        not needed if you passed your application to the :class:`MakoTemplates`
-        constructor.
-
-        ::
+        for use with this extension. This method is useful for the factory
+        pattern of extension initialization. Example::
 
             mako = MakoTemplates()
 
             app = Flask(__name__)
             mako.init_app(app)
 
+        .. note::
+            This call will fail if you called the :class:`MakoTemplates`
+            constructor with an ``app`` argument.
+
         """
+        if self.app:
+            raise RuntimeError("Cannot call init_app when app argument was "
+                               "provided to MakoTemplates constructor.")
+
         if not hasattr(app, 'extensions'):
             app.extensions = {}
 
