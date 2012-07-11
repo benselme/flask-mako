@@ -13,10 +13,9 @@ import os
 
 from flask.helpers import locked_cached_property
 from flask.signals import template_rendered
-from flask import _request_ctx_stack
 
-# Find the stack on which we want to store the database connection.
-# Starting with Flask 0.9, the _app_ctx_stack is the correct one,
+# Find the context stack so we can resolve which application is calling this
+# extension.  Starting with Flask 0.9, the _app_ctx_stack is the correct one,
 # before that we need to use the _request_ctx_stack.
 try:
     from flask import _app_ctx_stack as stack
@@ -86,46 +85,45 @@ class MakoTemplates(object):
         app.config.setdefault('MAKO_FILESYSTEM_CHECKS', True)
 
 
-    @staticmethod
-    def create_lookup(app):
-        """Returns a :class:`TemplateLookup <mako.lookup.TemplateLookup>`
-        instance that looks for templates from the same places as Flask, ie.
-        subfolders named 'templates' in both the app folder and its blueprints'
-        folders.
+def _create_lookup(app):
+    """Returns a :class:`TemplateLookup <mako.lookup.TemplateLookup>`
+    instance that looks for templates from the same places as Flask, ie.
+    subfolders named 'templates' in both the app folder and its blueprints'
+    folders.
 
-        If flask-babel is installed it will add support for it in the templates
-        by adding the appropriate imports clause.
+    If flask-babel is installed it will add support for it in the templates
+    by adding the appropriate imports clause.
 
-        """
-        imports = app.config['MAKO_IMPORTS'] or []
-        imports.append(_FLASK_IMPORTS)
+    """
+    imports = app.config['MAKO_IMPORTS'] or []
+    imports.append(_FLASK_IMPORTS)
 
-        if 'babel' in app.extensions:
-            imports.append(_BABEL_IMPORTS)
+    if 'babel' in app.extensions:
+        imports.append(_BABEL_IMPORTS)
 
-        kw = {
-            'input_encoding': app.config['MAKO_INPUT_ENCODING'],
-            'output_encoding': app.config['MAKO_OUTPUT_ENCODING'],
-            'module_directory': app.config['MAKO_MODULE_DIRECTORY'],
-            'collection_size': app.config['MAKO_COLLECTION_SIZE'],
-            'imports': imports,
-            'filesystem_checks': app.config['MAKO_FILESYSTEM_CHECKS'],
-        }
-        path = os.path.join(app.root_path, app.template_folder)
-        paths = [path]
-        blueprints = getattr(app, 'blueprints', {})
-        for name, blueprint in blueprints.iteritems():
-            if blueprint.template_folder:
-                blueprint_template_path = os.path.join(blueprint.root_path,
-                    blueprint.template_folder)
-                if os.path.isdir(blueprint_template_path):
-                    paths.append(blueprint_template_path)
-        return TemplateLookup(directories=paths, **kw)
+    kw = {
+        'input_encoding': app.config['MAKO_INPUT_ENCODING'],
+        'output_encoding': app.config['MAKO_OUTPUT_ENCODING'],
+        'module_directory': app.config['MAKO_MODULE_DIRECTORY'],
+        'collection_size': app.config['MAKO_COLLECTION_SIZE'],
+        'imports': imports,
+        'filesystem_checks': app.config['MAKO_FILESYSTEM_CHECKS'],
+    }
+    path = os.path.join(app.root_path, app.template_folder)
+    paths = [path]
+    blueprints = getattr(app, 'blueprints', {})
+    for name, blueprint in blueprints.iteritems():
+        if blueprint.template_folder:
+            blueprint_template_path = os.path.join(blueprint.root_path,
+                blueprint.template_folder)
+            if os.path.isdir(blueprint_template_path):
+                paths.append(blueprint_template_path)
+    return TemplateLookup(directories=paths, **kw)
 
 
 def _lookup(app):
     if not app._mako_lookup:
-        app._mako_lookup = MakoTemplates.create_lookup(app)
+        app._mako_lookup = _create_lookup(app)
     return app._mako_lookup
 
 
