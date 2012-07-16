@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-import os, sys, unittest, tempfile
+import os, sys, tempfile
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
+
 from contextlib import contextmanager
 
 import flask
@@ -151,22 +157,23 @@ class MakoDetailedTestCase(unittest.TestCase):
         with self.test_renderer(MAKO_IMPORTS=imports) as (_, mako):
             self.assertEqual(render_template("imports"), ascii_letters)
 
-    if flask.signals_available:
-        def test_signals(self):
-            """ Tests that template rendering fires the right signal. """
-            from flask.signals import template_rendered
+    @unittest.skipIf(not flask.signals_available,
+                     "This test requires Flask signaling support.")
+    def test_signals(self):
+        """ Tests that template rendering fires the right signal. """
+        from flask.signals import template_rendered
 
-            self._add_template("signal", "signal template")
-            with self.test_renderer() as (app, mako):
+        self._add_template("signal", "signal template")
+        with self.test_renderer() as (app, mako):
 
-                log = []
-                def record(*args, **extra):
-                    log.append(args)
-                template_rendered.connect(record, app)
+            log = []
+            def record(*args, **extra):
+                log.append(args)
+            template_rendered.connect(record, app)
 
-                result = render_template('signal')
+            result = render_template('signal')
 
-                self.assertEqual(len(log), 1)
+            self.assertEqual(len(log), 1)
 
     def test_multiple_apps(self):
         """ Tests that the Mako plugin works with multiple Flask apps. """
