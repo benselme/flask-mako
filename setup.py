@@ -8,8 +8,8 @@ allows developers to use  `Mako Templates
 templating engine.
 
 """
+import sys
 from setuptools import setup
-
 
 setup(
     name='Flask-Mako',
@@ -27,6 +27,7 @@ setup(
         'Flask',
         'Mako'
     ],
+    tests_require=(['unittest2'] if sys.version_info < (2, 7) else []),
     test_suite='tests.test_mako.suite',
     classifiers=[
         'Development Status :: 3 - Alpha',
