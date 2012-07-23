@@ -222,6 +222,10 @@ class MakoDetailedTestCase(unittest.TestCase):
             self.assertTrue('error_template' in e.text)
             self.assertTrue('line 3' in e.text)
 
+        with self.test_renderer(MAKO_TRANSLATE_EXCEPTIONS=False) as _:
+            with self.assertRaises(NameError):
+                render_template('error_template', arguments=['y'])
+
 try:
     from flaskext import babel
     from flaskext.babel import Babel
