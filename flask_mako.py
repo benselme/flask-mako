@@ -90,6 +90,7 @@ class MakoTemplates(object):
         app.config.setdefault('MAKO_COLLECTION_SIZE', -1)
         app.config.setdefault('MAKO_IMPORTS', None)
         app.config.setdefault('MAKO_FILESYSTEM_CHECKS', True)
+        app.config.setdefault('MAKO_TRANSLATE_EXCEPTIONS', True)
 
 
 def _create_lookup(app):
@@ -142,8 +143,12 @@ def _render(template, context, app):
         template_rendered.send(app, template=template, context=context)
         return rv
     except:
-        translated = TemplateError(template)
-        raise translated
+        translate = app.config.get("MAKO_TRANSLATE_EXCEPTIONS")
+        if translate:
+            translated = TemplateError(template)
+            raise translated
+        else:
+            raise
 
 
 def render_template(template_name, **context):
