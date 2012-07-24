@@ -108,7 +108,7 @@ class MakoDetailedTestCase(unittest.TestCase):
             with self.test_renderer(MAKO_OUTPUT_ENCODING="ascii",
                                     MAKO_CACHE_DIR=None) as (_, mako):
                 render_template('unicode', arg='test')
-        self.assertEqual(e.exception.tb.errorname, "UnicodeEncodeError")
+        self.assertEqual(e.exception.einfo[0].__name__, "UnicodeEncodeError")
 
     def test_basic_template(self):
         """ Tests that the application can render a template. """
