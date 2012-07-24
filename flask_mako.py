@@ -41,6 +41,9 @@ class MakoFrame(Frame):
         self.info = "(translated Mako exception)"
         self.filename = name
         self.lineno = line
+        old_locals = self.locals
+        self.locals = dict(tb.tb_frame.f_locals['context'].kwargs)
+        self.locals['__mako_module_locals__'] = old_locals
 
     def get_annotated_lines(self):
         """
