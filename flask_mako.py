@@ -153,6 +153,7 @@ class MakoTemplates(object):
         app.config.setdefault('MAKO_FILESYSTEM_CHECKS', True)
         app.config.setdefault('MAKO_TRANSLATE_EXCEPTIONS', True)
         app.config.setdefault('MAKO_DEFAULT_FILTERS', None)
+        app.config.setdefault('MAKO_PREPROCESSOR', None)
 
 
 def _create_lookup(app):
@@ -179,6 +180,7 @@ def _create_lookup(app):
         'imports': imports,
         'filesystem_checks': app.config['MAKO_FILESYSTEM_CHECKS'],
         'default_filters': app.config['MAKO_DEFAULT_FILTERS'],
+        'preprocessor': app.config['MAKO_PREPROCESSOR'],
     }
     path = os.path.join(app.root_path, app.template_folder)
     paths = [path]
