@@ -28,7 +28,7 @@ You can use the following parameters in your config to configure Mako's
 =======================     =====================
 Configuration Parameter     :class:`~mako.lookup.TemplateLookup` parameter
 =======================     =====================
-MAKO_INPUT_ENCODING         directories
+MAKO_INPUT_ENCODING         input_encoding
 MAKO_OUTPUT_ENCODING        output_encoding
 MAKO_MODULE_DIRECTORY       module_directory
 MAKO_COLLECTION_SIZE        collection_size
