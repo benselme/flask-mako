@@ -49,20 +49,20 @@ class MakoTestCase(unittest.TestCase):
     def testRenderTemplateFile(self):
         c = self.app.test_client()
         result = c.get('/templatefile')
-        self.assertEqual(result.data, 'Test succeeds')
+        self.assertEqual(result.data, b'Test succeeds')
 
     def testFlaskContext(self):
         c = self.app.test_client()
         result = c.get('/context')
-        self.assertEqual(result.data, 'test_g')
+        self.assertEqual(result.data, b'test_g')
 
     def testRenderTemplateDef(self):
         c = self.app.test_client()
         result = c.get('/def_file')
-        self.assertTrue('This is inside the def.' in result.data)
-        self.assertFalse('This is above the def.' in result.data)
-        self.assertFalse('That is inside the def.' in result.data)
-        self.assertFalse('This is below the def.' in result.data)
+        self.assertTrue(b'This is inside the def.' in result.data)
+        self.assertFalse(b'This is above the def.' in result.data)
+        self.assertFalse(b'That is inside the def.' in result.data)
+        self.assertFalse(b'This is below the def.' in result.data)
 
 class MakoDetailedTestCase(unittest.TestCase):
     """ Tests the `flask_mako` templating extension. """
@@ -75,8 +75,11 @@ class MakoDetailedTestCase(unittest.TestCase):
         if not os.path.exists(template_dir):
             os.mkdir(template_dir)
 
-        with open(os.path.join(template_dir, name), 'w') as f:
-            f.write(text.encode('utf8'))
+        if not isinstance(text, bytes):
+            text = text.encode('utf-8')
+
+        with open(os.path.join(template_dir, name), 'wb') as f:
+            f.write(text)
 
     @contextmanager
     def test_renderer(self, **kwargs):
@@ -119,8 +122,8 @@ class MakoDetailedTestCase(unittest.TestCase):
         """)
         with self.test_renderer() as (_, mako):
             result = render_template('basic', arguments=['testing', '123'])
-            self.assertTrue('testing' in result)
-            self.assertTrue('123' in result)
+            self.assertTrue(b'testing' in result)
+            self.assertTrue(b'123' in result)
 
     def test_standard_variables(self):
         """
@@ -155,7 +158,7 @@ class MakoDetailedTestCase(unittest.TestCase):
 
         imports = ["from string import ascii_letters"]
         with self.test_renderer(MAKO_IMPORTS=imports) as (_, mako):
-            self.assertEqual(render_template("imports"), ascii_letters)
+            self.assertEqual(render_template("imports"), ascii_letters.encode())
 
     @unittest.skipIf(not flask.signals_available,
                      "This test requires Flask signaling support.")
@@ -184,10 +187,10 @@ class MakoDetailedTestCase(unittest.TestCase):
 
         with self.test_renderer() as (app, mako):
             app.template_folder = alt1_dir
-            self.assertEqual(render_template('app'), 'test 1')
+            self.assertEqual(render_template('app'), b'test 1')
             with self.test_renderer(MAKO_CACHE_DIR=None) as (app, _):
                 app.template_folder = alt2_dir
-                self.assertEqual(render_template('app'), 'test 2')
+                self.assertEqual(render_template('app'), b'test 2')
 
 
             with self.assertRaises(RuntimeError):
@@ -203,7 +206,7 @@ class MakoDetailedTestCase(unittest.TestCase):
         with self.test_renderer() as (app, mako):
             app.register_blueprint(test, url_prefix="blue")
 
-            self.assertEqual(render_template("blue"), "blueprint")
+            self.assertEqual(render_template("blue"), b"blueprint")
 
     def test_error(self):
         """ Tests that template errors are properly handled. """

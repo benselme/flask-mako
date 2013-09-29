@@ -30,6 +30,8 @@ from mako import exceptions
 from mako.exceptions import RichTraceback, text_error_template
 
 
+itervalues = getattr(dict, 'itervalues', dict.values)
+
 _BABEL_IMPORTS =  'from flaskext.babel import gettext as _, ngettext, ' \
                   'pgettext, npgettext'
 _FLASK_IMPORTS =  'from flask.helpers import url_for, get_flashed_messages'
@@ -185,7 +187,7 @@ def _create_lookup(app):
     path = os.path.join(app.root_path, app.template_folder)
     paths = [path]
     blueprints = getattr(app, 'blueprints', {})
-    for name, blueprint in blueprints.iteritems():
+    for blueprint in itervalues(blueprints):
         if blueprint.template_folder:
             blueprint_template_path = os.path.join(blueprint.root_path,
                 blueprint.template_folder)
