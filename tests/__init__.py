@@ -1,1 +1,1 @@
-import test_mako
+from tests import test_mako
