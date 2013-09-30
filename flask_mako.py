@@ -204,6 +204,7 @@ def _lookup(app):
 
 def _render(template, context, app):
     """Renders the template and fires the signal"""
+    context.update(app.jinja_env.globals)
     app.update_template_context(context)
     try:
         rv = template.render(**context)
