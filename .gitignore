@@ -1,0 +1,12 @@
+MANIFEST
+build
+dist
+*.egg-info
+*.pyc
+*.pyo
+env/
+.tox
+docs/_build
+.coverage
+coverage_out
+.idea
