@@ -64,6 +64,50 @@ class MakoTestCase(unittest.TestCase):
         self.assertFalse(b'That is inside the def.' in result.data)
         self.assertFalse(b'This is below the def.' in result.data)
 
+
+class MakoMultipleDirectoriesTestCase(unittest.TestCase):
+
+    def setUp(self):
+        bp = Blueprint('bp', __name__, template_folder=['templates/bp', 'another_templates/another_bp'])
+
+        @bp.route('/render_bp_from_templates')
+        def render_bp_from_templates():
+            return render_template('bp.html', result="succeeds")
+
+        @bp.route('/render_bp_from_another_templates')
+        def render_bp_from_another_templates():
+            return render_template('another_bp.html', result="succeeds")
+
+        app = Flask(__name__, template_folder=['templates', 'another_templates'])
+        MakoTemplates(app)
+
+        @app.route('/render_from_templates')
+        def render_from_templates():
+            return render_template('template_file.html', result="succeeds")
+
+        @app.route('/render_from_another_templates')
+        def render_from_another_templates():
+            return render_template('another_template_file.html', result="succeeds")
+
+        app.register_blueprint(bp)
+        self.app = app
+        self.client = app.test_client()
+
+    def test_app_multiple_directories(self):
+        result = self.client.get('/render_from_templates')
+        self.assertEqual(result.data, b'Test succeeds')
+
+        result = self.client.get('/render_from_another_templates')
+        self.assertEqual(result.data, b'Another templates, test succeeds')
+
+    def test_blueprint_multiple_directories(self):
+        result = self.client.get('/render_bp_from_templates')
+        self.assertEqual(result.data, b'Blueprint templates, test succeeds')
+
+        result = self.client.get('/render_bp_from_another_templates')
+        self.assertEqual(result.data, b'Blueprint another templates, test succeeds')
+
+
 class MakoDetailedTestCase(unittest.TestCase):
     """ Tests the `flask_mako` templating extension. """
 
@@ -266,6 +310,7 @@ except ImportError:
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(MakoTestCase))
+    suite.addTest(unittest.makeSuite(MakoMultipleDirectoriesTestCase))
     suite.addTest(unittest.makeSuite(MakoDetailedTestCase))
     if MakoBabelTestCase:
         suite.addTest(unittest.makeSuite(MakoBabelTestCase))
