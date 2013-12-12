@@ -184,15 +184,20 @@ def _create_lookup(app):
         'default_filters': app.config['MAKO_DEFAULT_FILTERS'],
         'preprocessor': app.config['MAKO_PREPROCESSOR'],
     }
-    path = os.path.join(app.root_path, app.template_folder)
-    paths = [path]
+    if isinstance(app.template_folder, (list, tuple)):
+        paths = [os.path.join(app.root_path, tf) for tf in app.template_folder]
+    else:
+        paths = [os.path.join(app.root_path, app.template_folder)]
     blueprints = getattr(app, 'blueprints', {})
     for blueprint in itervalues(blueprints):
-        if blueprint.template_folder:
-            blueprint_template_path = os.path.join(blueprint.root_path,
-                blueprint.template_folder)
-            if os.path.isdir(blueprint_template_path):
-                paths.append(blueprint_template_path)
+        bp_tf = blueprint.template_folder
+        if bp_tf:
+            if isinstance(bp_tf, (list, tuple)):
+                paths.extend([os.path.join(blueprint.root_path, tf)
+                              for tf in bp_tf])
+            else:
+                paths.append(os.path.join(blueprint.root_path, bp_tf))
+    paths = [path for path in paths if os.path.isdir(path)]
     return TemplateLookup(directories=paths, **kw)
 
 
