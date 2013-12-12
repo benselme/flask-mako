@@ -62,6 +62,30 @@ multiple applications::
     app.template_folder = "templates"
     content.mako.init_app(app)
 
+
+Multiple Template Directories
+`````````````````````````````
+
+If the code within those templates tries to locate another template
+resource, it will need some way to find them. `Using TemplateLookup
+<http://docs.makotemplates.org/en/latest/usage.html#using-templatelookup>`_
+in Flask::
+
+    # ... in app ...
+    app = Flask(__name__)
+    app.template_folder = ['templates', 'another_templates']
+
+    # or
+    app = Flask(__name__, template_folder=['templates', 'another_templates'])
+
+    # ... in blueprint ...
+    bp = Blueprint('bp', __name__)
+    bp.template_folder = ['templates', 'another_templates']
+
+    # or
+    bp = Blueprint('bp', __name__, template_folder=['templates', 'another_templates'])
+
+
 Rendering
 `````````
 
