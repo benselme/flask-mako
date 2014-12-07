@@ -32,7 +32,7 @@ from mako.exceptions import RichTraceback, text_error_template
 
 itervalues = getattr(dict, 'itervalues', dict.values)
 
-_BABEL_IMPORTS =  'from flaskext.babel import gettext as _, ngettext, ' \
+_BABEL_IMPORTS =  'from flask.ext.babel import gettext as _, ngettext, ' \
                   'pgettext, npgettext'
 _FLASK_IMPORTS =  'from flask.helpers import url_for, get_flashed_messages'
 
