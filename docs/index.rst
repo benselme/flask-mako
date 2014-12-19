@@ -131,7 +131,9 @@ Babel integration
 Flask-Mako will detect `Flask-Babel
 <http://packages.python.org/Flask-Babel/>`_ if it is used by the application
 and will automatically add the appropriate imports when creating the
-:class:`TemplateLookup <mako.lookup.TemplateLookup>` object.
+:class:`TemplateLookup <mako.lookup.TemplateLookup>` object. For this to 
+work, the Flask-Babel extension must be initialized *before* the Flask-Mako
+extension.
 
 
 API
