@@ -174,6 +174,10 @@ def _create_lookup(app):
     if 'babel' in app.extensions:
         imports.append(_BABEL_IMPORTS)
 
+    # for beaker
+    cache_impl = app.config.get('MAKO_CACHE_IMPL')
+    cache_args = app.config.get('MAKO_CACHE_ARGS')
+
     kw = {
         'input_encoding': app.config['MAKO_INPUT_ENCODING'],
         'output_encoding': app.config['MAKO_OUTPUT_ENCODING'],
@@ -184,6 +188,13 @@ def _create_lookup(app):
         'default_filters': app.config['MAKO_DEFAULT_FILTERS'],
         'preprocessor': app.config['MAKO_PREPROCESSOR'],
     }
+
+    if cache_impl:
+        kw['cache_impl'] = cache_impl
+
+    if cache_args:
+        kw['cache_args'] = cache_args
+
     if isinstance(app.template_folder, (list, tuple)):
         paths = [os.path.join(app.root_path, tf) for tf in app.template_folder]
     else:
