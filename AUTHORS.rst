@@ -8,3 +8,5 @@ Other contributors:
 - sqrabs
 - cpher
 - lmntality
+- Alexander Plavin
+- GuoJing
