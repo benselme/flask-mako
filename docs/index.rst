@@ -34,6 +34,9 @@ MAKO_MODULE_DIRECTORY       module_directory
 MAKO_COLLECTION_SIZE        collection_size
 MAKO_IMPORTS                imports
 MAKO_FILESYSTEM_CHECKS      filesystem_checks
+MAKO_STRICT_UNDEFINED       strict_undefined
+MAKO_CACHE_IMPL             cache_impl
+MAKO_CACHE_ARGS             cache_args
 =======================     =====================
 
 Registration
