@@ -223,6 +223,9 @@ def _lookup(app):
 def _render(template, context, app):
     """Renders the template and fires the signal"""
     context.update(app.jinja_env.globals)
+    # Jinja2 has a function name `dict` in DEFAULT_NAMESPACE. This interferes
+    # with the built-in `dict`. Such as isinstance({}, dict)
+    context.pop('dict', None)
     app.update_template_context(context)
     try:
         rv = template.render(**context)
