@@ -232,7 +232,7 @@ def _render(template, context, app):
         translate = app.config.get("MAKO_TRANSLATE_EXCEPTIONS")
         if translate:
             translated = TemplateError(template)
-            raise translated
+            raise
         else:
             raise
 
