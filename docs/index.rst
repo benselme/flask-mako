@@ -44,7 +44,7 @@ Registration
 Applications can be registered directly in the extension constructor::
 
     from flask import Flask
-    from flask.ext.mako import MakoTemplates
+    from flask_mako import MakoTemplates
 
     app = Flask(__name__)
     mako = MakoTemplates(app)
@@ -97,7 +97,7 @@ as Jinja2 templates. Additionally, Mako templates receive the same context as
 Jinja2 templates. This allows you to use the same variables as you normally
 would (``g``, ``session``, ``url_for``, etc)::
 
-    from flask.ext.mako import render_template
+    from flask_mako import render_template
 
     def hello_mako():
         return render_template('hello.html', name='mako')
