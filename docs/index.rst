@@ -37,6 +37,7 @@ MAKO_FILESYSTEM_CHECKS      filesystem_checks
 MAKO_STRICT_UNDEFINED       strict_undefined
 MAKO_CACHE_IMPL             cache_impl
 MAKO_CACHE_ARGS             cache_args
+MAKO_DEFAULT_FILTERS        default_filters
 =======================     =====================
 
 Registration
