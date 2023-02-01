@@ -22,7 +22,7 @@ try:
 except ImportError:
     from flask import _request_ctx_stack as stack
 
-from werkzeug.debug.tbtools import Traceback, Frame, Line
+from werkzeug.debug.tbtools import DebugTraceback as Traceback, DebugFrameSummary as Frame
 
 from mako.lookup import TemplateLookup
 from mako.template import Template
