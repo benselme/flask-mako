@@ -22,7 +22,7 @@ try:
 except ImportError:
     from flask import _request_ctx_stack as stack
 
-from werkzeug.debug.tbtools import Traceback, Frame, Line
+from werkzeug.debug.tbtools import DebugTraceback as Traceback, DebugFrameSummary as Frame
 
 from mako.lookup import TemplateLookup
 from mako.template import Template
@@ -32,7 +32,7 @@ from mako.exceptions import RichTraceback, text_error_template
 
 itervalues = getattr(dict, 'itervalues', dict.values)
 
-_BABEL_IMPORTS =  'from flask.ext.babel import gettext as _, ngettext, ' \
+_BABEL_IMPORTS =  'from flask_babel import gettext as _, ngettext, ' \
                   'pgettext, npgettext'
 _FLASK_IMPORTS =  'from flask.helpers import url_for, get_flashed_messages'
 
