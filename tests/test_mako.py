@@ -10,8 +10,8 @@ from contextlib import contextmanager
 
 import flask
 from flask import Flask, Blueprint, g
-from flask.ext.mako import (MakoTemplates, TemplateError, render_template,
-                            render_template_string, render_template_def)
+from flask_mako import (MakoTemplates, TemplateError, render_template,
+                        render_template_string, render_template_def)
 
 from mako.exceptions import CompileException
 
